@@ -1,7 +1,7 @@
 # C++ to PictoBlox / Blockly Code Converter
 
 [![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/influencer-r/picto)
-[![Tests Passing](https://img.shields.io/badge/tests-11%2F11%20passing-brightgreen.svg)](test/run-tests.js)
+[![Tests Passing](https://img.shields.io/badge/tests-12%2F12%20passing-brightgreen.svg)](test/run-tests.js)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Repository](https://img.shields.io/badge/GitHub-influencer--r%2Fpicto-181717.svg?logo=github)](https://github.com/influencer-r/picto)
 
@@ -43,7 +43,7 @@ PictoBlox and Scratch 3.0 lists enforce **1-based indexing**, while standard C++
 - **Diagnostic Console**: Multi-tab bottom panel for syntax warnings, interactive AST tree view, raw Blockly XML output, and index conversion audits.
 
 ### 4. Multi-Format Export & Toast Feedback
-- **PictoBlox Project (`.json`)**: Scratch 3.0 / PictoBlox schema with stage, Arduino Uno target, blocks map, variables, and list descriptors.
+- **PictoBlox Project (`.sb3`)**: Official Scratch 3.0 / PictoBlox package containing `project.json` (stage, Arduino Uno target, visual blocks, variables, and list descriptors), recognized directly by the PictoBlox desktop and web file picker.
 - **Blockly Workspace (`.xml`)**: Standard serialized XML ready for loading into any Blockly or PictoBlox environment.
 - **Arduino Source (`.ino`)**: Native Arduino C++ sketch file.
 - **Vector Graphic (`.svg`)**: Scalable vector snapshot of your visual blocks diagram.
@@ -65,9 +65,12 @@ picto/
 │   ├── parser.js            # Recursive descent C++ AST parser
 │   ├── block-definitions.js # Custom PictoBlox/Arduino blocks & toolbox schema
 │   ├── ast-to-blockly.js    # AST to Blockly XML mapping engine + 0-to-1 indexing
-│   ├── pictoblox-exporter.js# Multi-format export (JSON, XML, INO, SVG)
+│   ├── pictoblox-exporter.js# Multi-format export (.sb3 package, JSON, XML, INO, SVG)
 │   ├── samples.js           # Built-in Arduino C++ sample sketches
 │   └── app.js               # Application state, UI bindings, and events
+└── test/
+    └── run-tests.js         # Automated test suite (11 unit tests)
+```
 └── test/
     └── run-tests.js         # Automated test suite (11 unit tests)
 ```

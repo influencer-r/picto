@@ -1,6 +1,6 @@
 /**
  * PictoBlox / Blockly Project Exporter
- * Generates valid PictoBlox-compatible JSON and XML project schemas,
+ * Generates valid PictoBlox .sb3 packages, JSON/XML schemas,
  * Arduino .ino files, and SVG visual block representations.
  */
 
@@ -15,8 +15,7 @@
 }(typeof self !== 'undefined' ? self : this, function () {
   'use strict';
 
-  function triggerDownload(content, filename, mimeType = 'application/octet-stream') {
-    const blob = new Blob([content], { type: mimeType });
+  function triggerDownloadBlob(blob, filename) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -26,7 +25,12 @@
     setTimeout(() => {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-    }, 200);
+    }, 300);
+  }
+
+  function triggerDownload(content, filename, mimeType = 'application/octet-stream') {
+    const blob = new Blob([content], { type: mimeType });
+    triggerDownloadBlob(blob, filename);
   }
 
   class Exporter {
@@ -48,11 +52,10 @@
     }
 
     /**
-     * Export PictoBlox Project Schema (.json)
-     * Compatible with PictoBlox / Scratch 3.0 project format
+     * Generate Scratch 3.0 / PictoBlox project.json object
      */
-    exportPictoBloxJson(filename = 'pictoblox_project.json') {
-      if (!this.workspace || typeof Blockly === 'undefined') {
+    getProjectJson() {
+      if (!this.workspace) {
         throw new Error('Workspace is not initialized');
       }
 
@@ -85,8 +88,8 @@
           fields: {},
           shadow: false,
           topLevel: !parent,
-          x: !parent ? (b.getRelativeToSurfaceXY ? b.getRelativeToSurfaceXY().x : 50) : undefined,
-          y: !parent ? (b.getRelativeToSurfaceXY ? b.getRelativeToSurfaceXY().y : 50) : undefined
+          x: !parent ? (b.getRelativeToSurfaceXY ? Math.round(b.getRelativeToSurfaceXY().x) : 50) : undefined,
+          y: !parent ? (b.getRelativeToSurfaceXY ? Math.round(b.getRelativeToSurfaceXY().y) : 50) : undefined
         };
 
         // Populate fields
@@ -99,7 +102,7 @@
         }
       }
 
-      const projectJson = {
+      return {
         targets: [
           {
             isStage: true,
@@ -151,7 +154,47 @@
           }
         }
       };
+    }
 
+    /**
+     * Export as valid PictoBlox .sb3 package (ZIP archive containing project.json)
+     * PictoBlox's file dialog specifically looks for .sb3 files.
+     */
+    async exportPictoBloxSb3(filename = 'pictoblox_project.sb3') {
+      const projectObj = this.getProjectJson();
+      const jsonStr = JSON.stringify(projectObj, null, 2);
+
+      // Check if JSZip is available in browser
+      const JSZipLib = (typeof JSZip !== 'undefined') ? JSZip
+        : (typeof window !== 'undefined' && window.JSZip) ? window.JSZip
+        : null;
+
+      if (JSZipLib) {
+        const zip = new JSZipLib();
+        zip.file('project.json', jsonStr);
+
+        const blob = await zip.generateAsync({
+          type: 'blob',
+          compression: 'DEFLATE',
+          compressionOptions: { level: 6 },
+          mimeType: 'application/x.scratch.sb3'
+        });
+
+        triggerDownloadBlob(blob, filename);
+        return blob;
+      } else {
+        // Fallback: save directly with .sb3 extension and mime type
+        const blob = new Blob([jsonStr], { type: 'application/x.scratch.sb3' });
+        triggerDownloadBlob(blob, filename);
+        return blob;
+      }
+    }
+
+    /**
+     * Export PictoBlox Project Schema (.json)
+     */
+    exportPictoBloxJson(filename = 'pictoblox_project.json') {
+      const projectJson = this.getProjectJson();
       const jsonStr = JSON.stringify(projectJson, null, 2);
       triggerDownload(jsonStr, filename, 'application/json');
       return jsonStr;
@@ -205,6 +248,7 @@
 
   return {
     Exporter,
-    triggerDownload
+    triggerDownload,
+    triggerDownloadBlob
   };
 }));

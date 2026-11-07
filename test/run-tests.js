@@ -109,6 +109,37 @@ for (const [key, sample] of Object.entries(samples.SAMPLES)) {
   });
 }
 
+// 7. PictoBlox .sb3 Schema Generation Test
+const exporterModule = require('../js/pictoblox-exporter');
+test('PictoBlox .sb3 project.json schema builder', () => {
+  const mockWorkspace = {
+    getAllBlocks: () => [
+      {
+        id: 'blk_1',
+        type: 'arduino_setup_loop',
+        getParent: () => null,
+        getNextBlock: () => null,
+        inputList: []
+      }
+    ],
+    getAllVariables: () => [
+      { getId: () => 'v1', name: 'ledPin', type: '' },
+      { getId: () => 'v2', name: 'myList', type: 'list' }
+    ]
+  };
+
+  const exporter = new exporterModule.Exporter(mockWorkspace);
+  const schema = exporter.getProjectJson();
+
+  assert.strictEqual(schema.meta.semver, '3.0.0');
+  assert.strictEqual(schema.targets.length, 2);
+  assert.strictEqual(schema.targets[0].isStage, true);
+  assert.strictEqual(schema.targets[1].name, 'Arduino Uno');
+  assert.strictEqual(schema.targets[1].blocks['blk_1'].opcode, 'arduino_setup_loop');
+  assert(schema.targets[0].variables['v1']);
+  assert(schema.targets[0].lists['v2']);
+});
+
 console.log(`\n=== Tests Complete: ${passedTests}/${totalTests} Passed ===\n`);
 if (passedTests !== totalTests) {
   process.exit(1);

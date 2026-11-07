@@ -283,11 +283,11 @@
       }
     });
 
-    document.getElementById('exportJsonBtn').addEventListener('click', () => {
+    document.getElementById('exportJsonBtn').addEventListener('click', async () => {
       try {
         const exporter = new PictoBloxExporter.Exporter(workspace);
-        exporter.exportPictoBloxJson('pictoblox_project.json');
-        showToast('Download Complete! PictoBlox project saved.');
+        await exporter.exportPictoBloxSb3('pictoblox_project.sb3');
+        showToast('Download Complete! PictoBlox (.sb3) project saved.');
       } catch (err) {
         showToast('Export failed: ' + err.message, 'error');
       }

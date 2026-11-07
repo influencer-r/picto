@@ -67,10 +67,10 @@
         <div id="exportDropdown" class="dropdown-menu">
           <div class="dropdown-header">Export &amp; Download</div>
           <button id="exportJsonBtn" class="dropdown-item">
-            <i class="fa-solid fa-file-code"></i>
+            <i class="fa-solid fa-file-zipper"></i>
             <div>
-              <span class="item-title">PictoBlox Project (.json)</span>
-              <span class="item-desc">PictoBlox / Scratch 3.0 schema</span>
+              <span class="item-title">PictoBlox Project (.sb3)</span>
+              <span class="item-desc">PictoBlox / Scratch 3.0 project package</span>
             </div>
           </button>
           <button id="exportXmlBtn" class="dropdown-item">
@@ -273,6 +273,9 @@
 
   <!-- Google Blockly -->
   <script src="https://cdn.jsdelivr.net/npm/blockly@10.4.3/blockly.min.js"></script>
+
+  <!-- JSZip for packaging .sb3 files -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
   <!-- Application Modules -->
   <script src="js/tokenizer.js"></script>
