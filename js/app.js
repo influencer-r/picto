@@ -283,47 +283,84 @@
       }
     });
 
-    // Cross-browser reliable file download helper
+    // Download Modal Controls
+    const downloadModal = document.getElementById('downloadModal');
+    const closeDownloadModal = () => {
+      if (downloadModal) downloadModal.classList.remove('visible');
+    };
+    const closeBtnX = document.getElementById('closeDownloadModalX');
+    const closeBtnDone = document.getElementById('btnCloseDownloadModal');
+    if (closeBtnX) closeBtnX.addEventListener('click', closeDownloadModal);
+    if (closeBtnDone) closeBtnDone.addEventListener('click', closeDownloadModal);
+
+    function showDownloadModal(urlOrBlob, filename) {
+      const modal = document.getElementById('downloadModal');
+      const directBtn = document.getElementById('btnDirectDownload');
+      const directLabel = document.getElementById('btnDirectDownloadLabel');
+      const modalDesc = document.getElementById('downloadModalDesc');
+      if (!modal || !directBtn) return;
+
+      const url = typeof urlOrBlob === 'string' ? urlOrBlob : window.URL.createObjectURL(urlOrBlob);
+      directBtn.href = url;
+      directBtn.download = filename;
+      if (directLabel) directLabel.textContent = `Save ${filename} to Downloads Folder`;
+      if (modalDesc) {
+        modalDesc.innerHTML = `Your file <strong>${escapeHtml(filename)}</strong> has been prepared.<br>If your browser did not automatically save it into your <strong>Downloads</strong> folder, click the button below:`;
+      }
+      modal.classList.add('visible');
+    }
+
+    // Cross-browser reliable file download helper with on-screen direct fallback
     const triggerFileDownload = (blob, filename) => {
+      // Ensure universal binary octet-stream MIME type
+      const downloadBlob = blob instanceof Blob
+        ? new Blob([blob], { type: 'application/octet-stream' })
+        : new Blob([blob], { type: 'text/plain;charset=utf-8' });
+
       // 1. IE / legacy Edge
       if (typeof window !== 'undefined' && window.navigator && window.navigator.msSaveOrOpenBlob) {
-        window.navigator.msSaveOrOpenBlob(blob, filename);
+        window.navigator.msSaveOrOpenBlob(downloadBlob, filename);
+        showDownloadModal(downloadBlob, filename);
         return;
       }
 
-      // 2. Standard Blob URL + Anchor element (attached to DOM, off-screen)
-      const url = window.URL.createObjectURL(blob);
+      // 2. Standard Blob URL + Automatic download click
+      const url = window.URL.createObjectURL(downloadBlob);
       const a = document.createElement('a');
       a.setAttribute('download', filename);
       a.setAttribute('href', url);
-      a.style.position = 'fixed';
-      a.style.left = '-9999px';
-      a.style.top = '-9999px';
-      a.style.opacity = '0';
+      a.setAttribute('rel', 'noopener');
+      a.style.display = 'none';
       document.body.appendChild(a);
 
-      try {
-        const clickEvent = new MouseEvent('click', {
-          bubbles: true,
-          cancelable: true,
-          view: window
-        });
-        a.dispatchEvent(clickEvent);
-      } catch (err) {
-        a.click();
-      }
-
       setTimeout(() => {
-        if (a.parentNode) {
-          a.parentNode.removeChild(a);
+        try {
+          a.click();
+        } catch (err) {
+          const clickEvent = new MouseEvent('click', {
+            bubbles: true,
+            cancelable: true,
+            view: window
+          });
+          a.dispatchEvent(clickEvent);
         }
+        setTimeout(() => {
+          if (a.parentNode) {
+            a.parentNode.removeChild(a);
+          }
+        }, 500);
+      }, 0);
+
+      // 3. Keep blob URL active for 60 seconds and show on-screen modal
+      setTimeout(() => {
         window.URL.revokeObjectURL(url);
-      }, 2000);
+      }, 60000);
+
+      showDownloadModal(url, filename);
     };
 
     // Robust error-trapped PictoBlox .sb3 export using JSZip
     const handleSb3Export = async (buttonEl) => {
-      console.log('Initiating .sb3 package generation...');
       if (elements.exportDropdown) {
         elements.exportDropdown.classList.remove('open');
       }
@@ -360,15 +397,13 @@
           zip.file(PictoBloxExporter.ASSETS.arduinoMd5, PictoBloxExporter.ASSETS.arduinoSvg);
         }
 
-        // Generate binary ZIP archive with official .sb3 MIME type
+        // Generate binary ZIP archive
         const blob = await zip.generateAsync({
           type: "blob",
           compression: "DEFLATE",
-          compressionOptions: { level: 6 },
-          mimeType: "application/x.scratch.sb3"
+          compressionOptions: { level: 6 }
         });
 
-        console.log('Generated zip blob, triggering download, size:', blob.size);
         // Trigger download
         triggerFileDownload(blob, "pictoblox_project.sb3");
         showToast("Download Complete! Saved as pictoblox_project.sb3");
@@ -406,10 +441,21 @@
       }
     });
 
+    document.getElementById('exportXmlBtn').addEventListener('click', () => {
+      try {
+        const dom = Blockly.Xml.workspaceToDom(workspace);
+        const xmlText = Blockly.Xml.domToPrettyText(dom);
+        triggerFileDownload(new Blob([xmlText], { type: 'application/xml' }), 'sketch_blocks.xml');
+        showToast('Download Complete! Workspace exported as XML.');
+      } catch (err) {
+        showToast('Export failed: ' + err.message, 'error');
+      }
+    });
+
     document.getElementById('exportInoBtn').addEventListener('click', () => {
       try {
-        const exporter = new PictoBloxExporter.Exporter(workspace);
-        exporter.exportArduinoIno(editor.getValue(), 'sketch.ino');
+        const inoCode = editor.getValue();
+        triggerFileDownload(new Blob([inoCode], { type: 'text/x-c' }), 'sketch.ino');
         showToast('Download Complete! Arduino .ino sketch saved.');
       } catch (err) {
         showToast('Export failed: ' + err.message, 'error');

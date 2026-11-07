@@ -24,13 +24,13 @@
 [[headers]]
   for = "/js/*"
   [headers.values]
-    Cache-Control = "public, max-age=604800, stale-while-revalidate=86400"
+    Cache-Control = "public, max-age=0, must-revalidate"
 
 # Cache Optimization for Styles
 [[headers]]
   for = "/*.css"
   [headers.values]
-    Cache-Control = "public, max-age=604800, stale-while-revalidate=86400"
+    Cache-Control = "public, max-age=0, must-revalidate"
 
 # Redirect rules (SPA fallback if needed)
 [[redirects]]

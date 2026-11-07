@@ -22,7 +22,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
 
   <!-- Application Stylesheet -->
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=2.2.0">
 </head>
 <body>
 
@@ -261,6 +261,31 @@
     </div>
   </div>
 
+  <!-- Direct Download Modal (Guaranteed 100% Fail-Safe) -->
+  <div id="downloadModal" class="progress-modal-backdrop">
+    <div class="progress-modal-card" style="max-width: 480px;">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fa-solid fa-circle-check" style="color: #10B981;"></i>
+          <span id="downloadModalTitle">Project Export Ready!</span>
+        </div>
+        <button id="closeDownloadModalX" class="btn-icon" style="color: #94A3B8;"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div id="downloadModalDesc" style="padding: 14px 0; color: #CBD5E1; font-size: 13.5px; line-height: 1.5;">
+        Your file download has been initiated into your computer's <strong>Downloads</strong> folder.<br>
+        If your browser blocked automatic downloads, click the button below:
+      </div>
+
+      <div style="display: flex; gap: 10px; margin-top: 14px;">
+        <a id="btnDirectDownload" class="btn btn-primary" href="#" download="pictoblox_project.sb3" style="flex: 1; text-align: center; justify-content: center; text-decoration: none; padding: 10px 16px;">
+          <i class="fa-solid fa-download"></i> <span id="btnDirectDownloadLabel">Save to Downloads Folder</span>
+        </a>
+        <button id="btnCloseDownloadModal" class="btn btn-secondary">Done</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Notification Banner -->
   <div id="toastNotification" class="toast-banner">
     <i class="fa-solid fa-circle-check"></i>
@@ -278,20 +303,20 @@
   <script src="https://cdn.jsdelivr.net/npm/blockly@10.4.3/blockly.min.js"></script>
 
   <!-- JSZip for packaging .sb3 files (Local bundle with CDN fallback) -->
-  <script src="js/jszip.min.js"></script>
+  <script src="js/jszip.min.js?v=2.2.0"></script>
   <script>
     if (typeof JSZip === 'undefined') {
       document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"><\/script>');
     }
   </script>
 
-  <!-- Application Modules -->
-  <script src="js/tokenizer.js"></script>
-  <script src="js/parser.js"></script>
-  <script src="js/block-definitions.js"></script>
-  <script src="js/ast-to-blockly.js"></script>
-  <script src="js/pictoblox-exporter.js"></script>
-  <script src="js/samples.js"></script>
-  <script src="js/app.js"></script>
+  <!-- Application Modules (Cache Busted v2.2.0) -->
+  <script src="js/tokenizer.js?v=2.2.0"></script>
+  <script src="js/parser.js?v=2.2.0"></script>
+  <script src="js/block-definitions.js?v=2.2.0"></script>
+  <script src="js/ast-to-blockly.js?v=2.2.0"></script>
+  <script src="js/pictoblox-exporter.js?v=2.2.0"></script>
+  <script src="js/samples.js?v=2.2.0"></script>
+  <script src="js/app.js?v=2.2.0"></script>
 </body>
 </html>
