@@ -1,0 +1,26 @@
+{
+  "name": "cpp-to-pictoblox-converter",
+  "version": "1.0.0",
+  "description": "Production-ready web-based C++ to PictoBlox / Blockly code converter with real-time AST parsing, live visual workspace, 0-to-1 array indexing conversion, and Netlify CI/CD.",
+  "main": "js/app.js",
+  "scripts": {
+    "test": "node test/run-tests.js",
+    "start": "npx serve -l 3000 .",
+    "build": "node test/run-tests.js"
+  },
+  "keywords": [
+    "c++",
+    "arduino",
+    "pictoblox",
+    "blockly",
+    "ast",
+    "code-converter",
+    "scratch-3",
+    "visual-programming"
+  ],
+  "author": "Google Antigravity Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

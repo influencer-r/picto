@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>C++ to PictoBlox &amp; Blockly Converter</title>
+  <meta name="description" content="Production-ready web-based C++ to PictoBlox and Blockly visual code converter with real-time AST parsing, live preview, 0-to-1 array indexing conversion, and project export.">
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>">
+
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- CodeMirror CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
+
+  <!-- Application Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Top Navigation / Application Header -->
+  <header class="app-header">
+    <div class="header-brand">
+      <div class="brand-logo">
+        <i class="fa-solid fa-shapes"></i>
+      </div>
+      <div class="brand-text">
+        <h1>C++ &rarr; PictoBlox</h1>
+        <span class="brand-badge">PROD READY</span>
+      </div>
+    </div>
+
+    <!-- Center Control: Sample sketch selector -->
+    <div class="header-presets">
+      <label for="sampleSelect"><i class="fa-solid fa-book-bookmark"></i> Sketch Preset:</label>
+      <select id="sampleSelect" class="form-select" title="Choose a pre-built Arduino C++ sketch to test">
+        <!-- Injected via JavaScript -->
+      </select>
+    </div>
+
+    <!-- Action Toolbar -->
+    <div class="header-actions">
+      <!-- Auto Convert Toggle -->
+      <button id="btnAutoToggle" class="btn btn-secondary active" title="Automatically re-convert on code typing">
+        <span class="toggle-indicator"></span>
+        <i class="fa-solid fa-bolt"></i> Auto-Convert
+      </button>
+
+      <!-- Convert Now Button -->
+      <button id="btnConvert" class="btn btn-primary" title="Execute AST Parser and render blocks (Ctrl + Enter)">
+        <i class="fa-solid fa-play"></i> Convert
+      </button>
+
+      <!-- Export Dropdown -->
+      <div class="dropdown-wrapper">
+        <button id="btnExportMenu" class="btn btn-accent" title="Export or download project">
+          <i class="fa-solid fa-download"></i> Export Project <i class="fa-solid fa-chevron-down"></i>
+        </button>
+        <div id="exportDropdown" class="dropdown-menu">
+          <div class="dropdown-header">Export &amp; Download</div>
+          <button id="exportJsonBtn" class="dropdown-item">
+            <i class="fa-solid fa-file-code"></i>
+            <div>
+              <span class="item-title">PictoBlox Project (.json)</span>
+              <span class="item-desc">PictoBlox / Scratch 3.0 schema</span>
+            </div>
+          </button>
+          <button id="exportXmlBtn" class="dropdown-item">
+            <i class="fa-solid fa-code"></i>
+            <div>
+              <span class="item-title">Blockly Workspace (.xml)</span>
+              <span class="item-desc">Standard XML block hierarchy</span>
+            </div>
+          </button>
+          <button id="exportInoBtn" class="dropdown-item">
+            <i class="fa-solid fa-microchip"></i>
+            <div>
+              <span class="item-title">Arduino Source (.ino)</span>
+              <span class="item-desc">Native C++ sketch file</span>
+            </div>
+          </button>
+          <button id="exportSvgBtn" class="dropdown-item">
+            <i class="fa-solid fa-image"></i>
+            <div>
+              <span class="item-title">Canvas Vector (.svg)</span>
+              <span class="item-desc">High-resolution block snapshot</span>
+            </div>
+          </button>
+          <div class="dropdown-divider"></div>
+          <button id="copyXmlBtn" class="dropdown-item">
+            <i class="fa-solid fa-copy"></i>
+            <div>
+              <span class="item-title">Copy Blockly XML</span>
+              <span class="item-desc">Copy raw XML to clipboard</span>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Split-Screen Workspace -->
+  <main class="main-split-container">
+
+    <!-- Left Pane: C++ Source Editor -->
+    <section id="leftPane" class="split-pane left-pane">
+      <div class="pane-header">
+        <div class="pane-title">
+          <i class="fa-solid fa-file-lines"></i>
+          <span>sketch.ino</span>
+          <span class="lang-tag">C++ / Arduino</span>
+        </div>
+        <div class="pane-tools">
+          <button id="btnBeautify" class="btn-icon" title="Format code indentation">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Format
+          </button>
+          <button id="btnClear" class="btn-icon" title="Clear editor and workspace">
+            <i class="fa-solid fa-trash-can"></i> Clear
+          </button>
+        </div>
+      </div>
+
+      <!-- CodeMirror Container -->
+      <div id="cppEditor" class="editor-container"></div>
+    </section>
+
+    <!-- Draggable Divider -->
+    <div id="splitDivider" class="split-divider" title="Drag to resize panels">
+      <div class="divider-handle"></div>
+    </div>
+
+    <!-- Right Pane: PictoBlox / Blockly Visual Canvas -->
+    <section id="rightPane" class="split-pane right-pane">
+      <div class="pane-header">
+        <div class="pane-title">
+          <i class="fa-solid fa-cubes"></i>
+          <span>PictoBlox Canvas</span>
+          <span id="blockCountBadge" class="badge badge-accent">0 Blocks</span>
+        </div>
+        <div class="pane-tools">
+          <button id="btnZoomIn" class="btn-icon" title="Zoom in">
+            <i class="fa-solid fa-magnifying-glass-plus"></i>
+          </button>
+          <button id="btnZoomOut" class="btn-icon" title="Zoom out">
+            <i class="fa-solid fa-magnifying-glass-minus"></i>
+          </button>
+          <button id="btnCenter" class="btn-icon" title="Center workspace">
+            <i class="fa-solid fa-compress"></i> Center
+          </button>
+        </div>
+      </div>
+
+      <!-- Blockly Canvas Container -->
+      <div id="blocklyArea" class="blockly-container">
+        <div id="blocklyDiv"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Bottom Collapsible Diagnostic Console -->
+  <footer id="bottomConsole" class="bottom-console">
+    <div class="console-header">
+      <div class="console-tabs">
+        <button class="console-tab active" data-tab="tabDiagnostics">
+          <i class="fa-solid fa-stethoscope"></i> Diagnostics &amp; Warnings
+          <span id="diagCountBadge" class="badge badge-neutral">0 Issues</span>
+        </button>
+        <button class="console-tab" data-tab="tabAst">
+          <i class="fa-solid fa-network-wired"></i> AST Inspector
+        </button>
+        <button class="console-tab" data-tab="tabXml">
+          <i class="fa-solid fa-code"></i> Blockly XML Schema
+        </button>
+        <button class="console-tab" data-tab="tabIndexAudit">
+          <i class="fa-solid fa-list-ol"></i> 0-to-1 Index Audit
+        </button>
+      </div>
+
+      <button id="consoleToggle" class="console-toggle-btn" title="Toggle diagnostic console">
+        <i class="fa-solid fa-chevron-down"></i> Hide Diagnostics
+      </button>
+    </div>
+
+    <div class="console-body">
+      <!-- Diagnostics Tab Panel -->
+      <div id="tabDiagnostics" class="tab-content-panel active">
+        <div id="diagnosticList" class="diagnostic-list">
+          <div class="diag-empty">No active issues detected. C++ code is valid.</div>
+        </div>
+      </div>
+
+      <!-- AST Inspector Tab Panel -->
+      <div id="tabAst" class="tab-content-panel" style="display: none;">
+        <pre id="astTreeContainer" class="code-preview">// AST JSON representation will appear here...</pre>
+      </div>
+
+      <!-- Blockly XML Schema Tab Panel -->
+      <div id="tabXml" class="tab-content-panel" style="display: none;">
+        <pre id="xmlPreviewContainer" class="code-preview">&lt;!-- Blockly XML representation will appear here... --&gt;</pre>
+      </div>
+
+      <!-- 0-to-1 Index Audit Tab Panel -->
+      <div id="tabIndexAudit" class="tab-content-panel" style="display: none;">
+        <div id="indexAuditContainer">
+          <!-- Populated by JavaScript -->
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Conversion Progress Modal -->
+  <div id="progressModal" class="progress-modal-backdrop">
+    <div class="progress-modal-card">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fa-solid fa-gear fa-spin"></i>
+          <span>Converting C++ to PictoBlox</span>
+        </div>
+        <span id="progressPercent" class="modal-percent">0%</span>
+      </div>
+
+      <!-- Animated Progress Bar -->
+      <div class="progress-track">
+        <div id="progressBar" class="progress-bar-fill" style="width: 0%;"></div>
+      </div>
+
+      <!-- Current Step Status -->
+      <div id="progressStepLabel" class="progress-current-step">Initializing AST engine...</div>
+
+      <!-- Step-by-Step Checklist -->
+      <div class="progress-steps-list">
+        <div class="step-item" id="step1">
+          <span class="step-dot"><i class="fa-solid fa-check"></i></span>
+          <span class="step-text">1. Tokenizing C++ Lexical Stream</span>
+        </div>
+        <div class="step-item" id="step2">
+          <span class="step-dot"><i class="fa-solid fa-check"></i></span>
+          <span class="step-text">2. Constructing Abstract Syntax Tree (AST)</span>
+        </div>
+        <div class="step-item" id="step3">
+          <span class="step-dot"><i class="fa-solid fa-check"></i></span>
+          <span class="step-text">3. Mapping Schemas &amp; 0-to-1 Array Indexing</span>
+        </div>
+        <div class="step-item" id="step4">
+          <span class="step-dot"><i class="fa-solid fa-check"></i></span>
+          <span class="step-text">4. Rendering Visual Blockly Canvas</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Banner -->
+  <div id="toastNotification" class="toast-banner">
+    <i class="fa-solid fa-circle-check"></i>
+    <span id="toastMessage">Operation finished successfully!</span>
+  </div>
+
+  <!-- Scripts: Dependencies -->
+  <!-- CodeMirror 5 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
+
+  <!-- Google Blockly -->
+  <script src="https://cdn.jsdelivr.net/npm/blockly@10.4.3/blockly.min.js"></script>
+
+  <!-- Application Modules -->
+  <script src="js/tokenizer.js"></script>
+  <script src="js/parser.js"></script>
+  <script src="js/block-definitions.js"></script>
+  <script src="js/ast-to-blockly.js"></script>
+  <script src="js/pictoblox-exporter.js"></script>
+  <script src="js/samples.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
