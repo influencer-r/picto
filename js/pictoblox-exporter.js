@@ -15,6 +15,18 @@
 }(typeof self !== 'undefined' ? self : this, function () {
   'use strict';
 
+  // Default costume assets required by Scratch 3.0 / PictoBlox
+  // Having these in the .sb3 prevents PictoBlox from hanging on the purple loading screen!
+  const ASSETS = {
+    backdropSvg: '<svg version="1.1" width="480" height="360" viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><rect width="480" height="360" fill="#ffffff"/></svg>',
+    backdropMd5: 'cd21514d0531fdffb22204e0ec5ed84a.svg',
+    backdropId: 'cd21514d0531fdffb22204e0ec5ed84a',
+
+    arduinoSvg: '<svg version="1.1" width="96" height="100" viewBox="0 0 96 100" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><rect width="96" height="100" rx="8" fill="#00979C"/><text x="48" y="55" font-family="sans-serif" font-size="14" font-weight="bold" fill="#ffffff" text-anchor="middle">Arduino</text></svg>',
+    arduinoMd5: '0fb9be3e8397c772915c9de80f31481f.svg',
+    arduinoId: '0fb9be3e8397c772915c9de80f31481f'
+  };
+
   function triggerDownloadBlob(blob, filename) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -53,6 +65,7 @@
 
     /**
      * Generate Scratch 3.0 / PictoBlox project.json object
+     * Fully populated with targets, costumes, and block mappings
      */
     getProjectJson() {
       if (!this.workspace) {
@@ -113,7 +126,16 @@
             blocks: {},
             comments: {},
             currentCostume: 0,
-            costumes: [],
+            costumes: [
+              {
+                name: "backdrop1",
+                dataFormat: "svg",
+                assetId: ASSETS.backdropId,
+                md5ext: ASSETS.backdropMd5,
+                rotationCenterX: 240,
+                rotationCenterY: 180
+              }
+            ],
             sounds: [],
             volume: 100,
             layerOrder: 0
@@ -127,7 +149,16 @@
             blocks: blocksMap,
             comments: {},
             currentCostume: 0,
-            costumes: [],
+            costumes: [
+              {
+                name: "arduino",
+                dataFormat: "svg",
+                assetId: ASSETS.arduinoId,
+                md5ext: ASSETS.arduinoMd5,
+                rotationCenterX: 48,
+                rotationCenterY: 50
+              }
+            ],
             sounds: [],
             volume: 100,
             visible: true,
@@ -157,10 +188,10 @@
     }
 
     /**
-     * Export as valid PictoBlox .sb3 package (ZIP archive containing project.json)
+     * Export as valid PictoBlox .sb3 package (ZIP archive containing project.json and costume assets)
      * PictoBlox's file dialog specifically looks for .sb3 files.
      */
-    async exportPictoBloxSb3(filename = 'pictoblox_project.sb3') {
+    async exportPictoBloxSb3(filename = 'my_pictoblox_project.sb3') {
       const projectObj = this.getProjectJson();
       const jsonStr = JSON.stringify(projectObj, null, 2);
 
@@ -169,25 +200,29 @@
         : (typeof window !== 'undefined' && window.JSZip) ? window.JSZip
         : null;
 
-      if (JSZipLib) {
-        const zip = new JSZipLib();
-        zip.file('project.json', jsonStr);
-
-        const blob = await zip.generateAsync({
-          type: 'blob',
-          compression: 'DEFLATE',
-          compressionOptions: { level: 6 },
-          mimeType: 'application/x.scratch.sb3'
-        });
-
-        triggerDownloadBlob(blob, filename);
-        return blob;
-      } else {
-        // Fallback: save directly with .sb3 extension and mime type
-        const blob = new Blob([jsonStr], { type: 'application/x.scratch.sb3' });
-        triggerDownloadBlob(blob, filename);
-        return blob;
+      if (!JSZipLib) {
+        throw new Error('JSZip library is not loaded. Please ensure JSZip CDN is included in index.html');
       }
+
+      const zip = new JSZipLib();
+      // 1. Bundle project.json inside ZIP root
+      zip.file('project.json', jsonStr);
+
+      // 2. Include standard SVG costume assets so PictoBlox doesn't get stuck on purple loading screen
+      zip.file(ASSETS.backdropMd5, ASSETS.backdropSvg);
+      zip.file(ASSETS.arduinoMd5, ASSETS.arduinoSvg);
+
+      // 3. Generate binary ZIP archive with official .sb3 MIME type
+      const blob = await zip.generateAsync({
+        type: 'blob',
+        compression: 'DEFLATE',
+        compressionOptions: { level: 6 },
+        mimeType: 'application/x.scratch.sb3'
+      });
+
+      const finalName = filename.endsWith('.sb3') ? filename : `${filename}.sb3`;
+      triggerDownloadBlob(blob, finalName);
+      return blob;
     }
 
     /**
@@ -248,6 +283,7 @@
 
   return {
     Exporter,
+    ASSETS,
     triggerDownload,
     triggerDownloadBlob
   };

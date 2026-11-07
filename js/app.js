@@ -284,14 +284,19 @@
     });
 
     // Export PictoBlox Project (.sb3) using JSZip packaging
-    document.getElementById('exportJsonBtn').addEventListener('click', async () => {
+    const handleSb3Export = async () => {
       try {
-        await exportPictoBloxSb3('pictoblox_project.sb3');
-        showToast('Download Complete! PictoBlox (.sb3) project saved.');
+        await exportPictoBloxSb3('my_pictoblox_project.sb3');
+        showToast('Download Complete! Saved as my_pictoblox_project.sb3');
       } catch (err) {
         showToast('Export failed: ' + err.message, 'error');
       }
-    });
+    };
+
+    const exportSb3Btn = document.getElementById('exportSb3Btn') || document.getElementById('exportJsonBtn');
+    if (exportSb3Btn) {
+      exportSb3Btn.addEventListener('click', handleSb3Export);
+    }
 
     document.getElementById('exportInoBtn').addEventListener('click', () => {
       try {
@@ -354,10 +359,11 @@
 
   /**
    * Export PictoBlox Project (.sb3) using JSZip
-   * Packages project.json inside a valid ZIP archive structure with MIME type application/x.scratch.sb3
-   * so PictoBlox unzips and reads project.json automatically upon load.
+   * Packages project.json and default costume assets inside a valid ZIP archive structure
+   * with MIME type application/x.scratch.sb3 so PictoBlox unzips and reads project.json
+   * automatically upon load without hanging on the purple loading screen.
    */
-  async function exportPictoBloxSb3(filename = 'pictoblox_project.sb3') {
+  async function exportPictoBloxSb3(filename = 'my_pictoblox_project.sb3') {
     if (!workspace) {
       throw new Error('Workspace is not initialized');
     }
@@ -376,9 +382,18 @@
       throw new Error('JSZip library is missing. Please ensure jszip.min.js is included.');
     }
 
-    // 3. Package project.json inside a valid ZIP archive structure
+    // 3. Package project.json and standard costume assets inside a valid ZIP archive structure
     const zip = new JSZipConstructor();
     zip.file('project.json', jsonString);
+
+    // Embed default SVG costume assets so PictoBlox never gets stuck on purple loading screen
+    if (typeof PictoBloxExporter !== 'undefined' && PictoBloxExporter.ASSETS) {
+      zip.file(PictoBloxExporter.ASSETS.backdropMd5, PictoBloxExporter.ASSETS.backdropSvg);
+      zip.file(PictoBloxExporter.ASSETS.arduinoMd5, PictoBloxExporter.ASSETS.arduinoSvg);
+    } else {
+      zip.file('cd21514d0531fdffb22204e0ec5ed84a.svg', '<svg version="1.1" width="480" height="360" viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg"><rect width="480" height="360" fill="#ffffff"/></svg>');
+      zip.file('0fb9be3e8397c772915c9de80f31481f.svg', '<svg version="1.1" width="96" height="100" viewBox="0 0 96 100" xmlns="http://www.w3.org/2000/svg"><rect width="96" height="100" rx="8" fill="#00979C"/><text x="48" y="55" font-family="sans-serif" font-size="14" font-weight="bold" fill="#ffffff" text-anchor="middle">Arduino</text></svg>');
+    }
 
     // 4. Generate the ZIP archive blob with application/x.scratch.sb3 MIME type
     const zipBlob = await zip.generateAsync({
@@ -388,7 +403,7 @@
       mimeType: 'application/x.scratch.sb3'
     });
 
-    // 5. Trigger download with .sb3 extension
+    // 5. Force download to trigger with .sb3 file extension
     const url = URL.createObjectURL(zipBlob);
     const a = document.createElement('a');
     a.href = url;
