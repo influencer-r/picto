@@ -576,8 +576,12 @@
         }
       ],
       monitors: [],
-      extensions: ["arduinoUno"],
-      meta: { semver: "3.0.0", vm: "0.2.0", agent: "PictoBlox Web Converter" }
+      extensions: [],
+      boardSelected: "Arduino Uno",
+      projectMode: "UPLOAD",
+      codingMode: "blocks",
+      isHorizontalMode: false,
+      meta: { semver: "3.0.0", vm: "0.2.0", agent: "PictoBlox" }
     };
   }
 

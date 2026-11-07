@@ -127,12 +127,15 @@
           y: !parent ? (b.getRelativeToSurfaceXY ? Math.round(b.getRelativeToSurfaceXY().y) : 50) : undefined
         };
 
-        // Populate fields
+        // Populate fields and inputs
         for (const input of b.inputList) {
           for (const field of input.fieldRow) {
             if (field.name) {
               blocksMap[id].fields[field.name] = [field.getValue(), null];
             }
+          }
+          if (input.connection && input.connection.targetBlock()) {
+            blocksMap[id].inputs[input.name] = [2, input.connection.targetBlock().id];
           }
         }
       }
@@ -193,18 +196,15 @@
           }
         ],
         monitors: [],
-        extensions: [
-          "arduinoUno",
-          "evive"
-        ],
+        extensions: [],
+        boardSelected: "Arduino Uno",
+        projectMode: "UPLOAD",
+        codingMode: "blocks",
+        isHorizontalMode: false,
         meta: {
           semver: "3.0.0",
           vm: "0.2.0",
-          agent: "PictoBlox Web Converter v1.0",
-          platform: {
-            name: "PictoBlox / Blockly",
-            url: "https://thestempedia.com/product/pictoblox/"
-          }
+          agent: "PictoBlox"
         }
       };
     }
