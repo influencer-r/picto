@@ -1,8 +1,9 @@
 # C++ to PictoBlox / Blockly Code Converter
 
-[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start)
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/influencer-r/picto)
 [![Tests Passing](https://img.shields.io/badge/tests-11%2F11%20passing-brightgreen.svg)](test/run-tests.js)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Repository](https://img.shields.io/badge/GitHub-influencer--r%2Fpicto-181717.svg?logo=github)](https://github.com/influencer-r/picto)
 
 A production-ready, fully functional web application that parses standard Arduino C++ source code into an Abstract Syntax Tree (AST) and renders authentic visual block equivalents in **PictoBlox** and **Google Blockly**. Features split-screen live preview, automatic 0-to-1 array/list index translation, step-by-step progress modal, diagnostic error reporting, and multi-format project export.
 
@@ -128,7 +129,7 @@ git commit -m "feat: initial release of C++ to PictoBlox web converter"
 2. Link your local repository and push:
 ```bash
 git branch -M main
-git remote add origin https://github.com/<YOUR-USERNAME>/cpp-to-pictoblox-converter.git
+git remote add origin https://github.com/influencer-r/picto.git
 git push -u origin main
 ```
 
