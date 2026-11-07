@@ -23,14 +23,6 @@
 
   <!-- Application Stylesheet -->
   <link rel="stylesheet" href="styles.css">
-
-  <!-- JSZip Library in <head> before scripts (with CDN fallback) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-  <script>
-    if (typeof JSZip === 'undefined') {
-      document.write('<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"><\/script>');
-    }
-  </script>
 </head>
 <body>
 
@@ -285,8 +277,13 @@
   <!-- Google Blockly -->
   <script src="https://cdn.jsdelivr.net/npm/blockly@10.4.3/blockly.min.js"></script>
 
-  <!-- JSZip for packaging .sb3 files -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <!-- JSZip for packaging .sb3 files (Local bundle with CDN fallback) -->
+  <script src="js/jszip.min.js"></script>
+  <script>
+    if (typeof JSZip === 'undefined') {
+      document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"><\/script>');
+    }
+  </script>
 
   <!-- Application Modules -->
   <script src="js/tokenizer.js"></script>

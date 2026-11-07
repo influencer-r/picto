@@ -28,16 +28,38 @@
   };
 
   function triggerDownloadBlob(blob, filename) {
+    if (typeof window !== 'undefined' && window.navigator && window.navigator.msSaveOrOpenBlob) {
+      window.navigator.msSaveOrOpenBlob(blob, filename);
+      return;
+    }
+
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
+    a.style.position = 'fixed';
+    a.style.left = '-9999px';
+    a.style.top = '-9999px';
+    a.style.opacity = '0';
     a.href = url;
     a.download = filename;
     document.body.appendChild(a);
-    a.click();
+
+    try {
+      const evt = new MouseEvent('click', {
+        view: window,
+        bubbles: true,
+        cancelable: true
+      });
+      a.dispatchEvent(evt);
+    } catch (e) {
+      a.click();
+    }
+
     setTimeout(() => {
-      document.body.removeChild(a);
+      if (a.parentNode) {
+        a.parentNode.removeChild(a);
+      }
       URL.revokeObjectURL(url);
-    }, 300);
+    }, 1500);
   }
 
   function triggerDownload(content, filename, mimeType = 'application/octet-stream') {

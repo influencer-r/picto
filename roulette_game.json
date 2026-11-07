@@ -1,0 +1,177 @@
+{
+  "targets": [
+    {
+      "isStage": true,
+      "name": "Stage",
+      "variables": {
+        "var_redLedPin_mw6ibmq2_2": [
+          "redLedPin",
+          0
+        ],
+        "var_buttonPin_mw6ibmq2_3": [
+          "buttonPin",
+          0
+        ],
+        "var_buzzerPin_mw6ibmq2_4": [
+          "buzzerPin",
+          0
+        ],
+        "var_totalLeds_mw6ibmq2_5": [
+          "totalLeds",
+          0
+        ],
+        "var_currentLed_mw6ibmq2_6": [
+          "currentLed",
+          0
+        ],
+        "var_gamePaused_mw6ibmq2_7": [
+          "gamePaused",
+          0
+        ],
+        "var_i_mw6ibmq3_8": [
+          "i",
+          0
+        ]
+      },
+      "lists": {
+        "var_ledPins_mw6ibmq2_1": [
+          "ledPins",
+          [
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13
+          ]
+        ]
+      },
+      "broadcasts": {},
+      "blocks": {},
+      "comments": {},
+      "currentCostume": 0,
+      "costumes": [
+        {
+          "name": "backdrop1",
+          "dataFormat": "svg",
+          "assetId": "cd21514d0531fdffb22204e0ec5ed84a",
+          "md5ext": "cd21514d0531fdffb22204e0ec5ed84a.svg",
+          "rotationCenterX": 240,
+          "rotationCenterY": 180
+        }
+      ],
+      "sounds": [],
+      "volume": 100,
+      "layerOrder": 0
+    },
+    {
+      "isStage": false,
+      "name": "Arduino Uno",
+      "variables": {
+        "var_redLedPin": [
+          "redLedPin",
+          7
+        ],
+        "var_buttonPin": [
+          "buttonPin",
+          "A1"
+        ],
+        "var_buzzerPin": [
+          "buzzerPin",
+          "A2"
+        ],
+        "var_totalLeds": [
+          "totalLeds",
+          12
+        ],
+        "var_currentLed": [
+          "currentLed",
+          0
+        ],
+        "var_gamePaused": [
+          "gamePaused",
+          false
+        ]
+      },
+      "lists": {
+        "var_ledPins": [
+          "ledPins",
+          [
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13
+          ]
+        ],
+        "var_ledPins_mw6ibmq2_1": [
+          "ledPins",
+          [
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13
+          ]
+        ]
+      },
+      "broadcasts": {},
+      "blocks": {},
+      "comments": {},
+      "currentCostume": 0,
+      "costumes": [
+        {
+          "name": "arduino",
+          "dataFormat": "svg",
+          "assetId": "0fb9be3e8397c772915c9de80f31481f",
+          "md5ext": "0fb9be3e8397c772915c9de80f31481f.svg",
+          "rotationCenterX": 48,
+          "rotationCenterY": 50
+        }
+      ],
+      "sounds": [],
+      "volume": 100,
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "size": 100,
+      "direction": 90,
+      "draggable": false,
+      "rotationStyle": "all around"
+    }
+  ],
+  "monitors": [],
+  "extensions": [
+    "arduinoUno",
+    "evive"
+  ],
+  "meta": {
+    "semver": "3.0.0",
+    "vm": "0.2.0",
+    "agent": "PictoBlox C++ Converter v1.0",
+    "platform": {
+      "name": "PictoBlox",
+      "url": "https://thestempedia.com/product/pictoblox/"
+    }
+  }
+}

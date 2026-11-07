@@ -1,0 +1,538 @@
+<xml xmlns="https://developers.google.com/blockly/xml">
+  <variables>
+    <variable id="var_ledPins_mw6ibmq2_1" type="list">ledPins</variable>
+    <variable id="var_redLedPin_mw6ibmq2_2" type="">redLedPin</variable>
+    <variable id="var_buttonPin_mw6ibmq2_3" type="">buttonPin</variable>
+    <variable id="var_buzzerPin_mw6ibmq2_4" type="">buzzerPin</variable>
+    <variable id="var_totalLeds_mw6ibmq2_5" type="">totalLeds</variable>
+    <variable id="var_currentLed_mw6ibmq2_6" type="">currentLed</variable>
+    <variable id="var_gamePaused_mw6ibmq2_7" type="">gamePaused</variable>
+    <variable id="var_i_mw6ibmq3_8" type="">i</variable>
+  </variables>
+  <block type="arduino_setup_loop" id="setup_loop_mw6ibmq3_9" x="40" y="40">
+    <statement name="SETUP">
+      <block type="variables_set" id="set_mw6ibmq4_10">
+        <field name="VAR" id="var_ledPins_mw6ibmq2_1">ledPins</field>
+        <value name="VALUE">
+          <shadow type="math_number"><field name="NUM">0</field></shadow>
+        </value>
+      </block>
+        <next>
+        <block type="variables_set" id="set_mw6ibmq4_11">
+          <field name="VAR" id="var_redLedPin_mw6ibmq2_2">redLedPin</field>
+          <value name="VALUE">
+            <block type="math_number" id="num_mw6ibmq4_12">
+              <field name="NUM">7</field>
+            </block>
+          </value>
+        </block>
+          <next>
+          <block type="variables_set" id="set_mw6ibmq4_13">
+            <field name="VAR" id="var_buttonPin_mw6ibmq2_3">buttonPin</field>
+            <value name="VALUE">
+              <block type="variables_get" id="vget_mw6ibmq4_15">
+                <field name="VAR" id="var_A1_mw6ibmq4_14">A1</field>
+              </block>
+            </value>
+          </block>
+            <next>
+            <block type="variables_set" id="set_mw6ibmq4_16">
+              <field name="VAR" id="var_buzzerPin_mw6ibmq2_4">buzzerPin</field>
+              <value name="VALUE">
+                <block type="variables_get" id="vget_mw6ibmq4_18">
+                  <field name="VAR" id="var_A2_mw6ibmq4_17">A2</field>
+                </block>
+              </value>
+            </block>
+              <next>
+              <block type="variables_set" id="set_mw6ibmq4_19">
+                <field name="VAR" id="var_totalLeds_mw6ibmq2_5">totalLeds</field>
+                <value name="VALUE">
+                  <block type="math_number" id="num_mw6ibmq4_20">
+                    <field name="NUM">12</field>
+                  </block>
+                </value>
+              </block>
+                <next>
+                <block type="variables_set" id="set_mw6ibmq4_21">
+                  <field name="VAR" id="var_currentLed_mw6ibmq2_6">currentLed</field>
+                  <value name="VALUE">
+                    <block type="math_number" id="num_mw6ibmq4_22">
+                      <field name="NUM">0</field>
+                    </block>
+                  </value>
+                </block>
+                  <next>
+                  <block type="variables_set" id="set_mw6ibmq4_23">
+                    <field name="VAR" id="var_gamePaused_mw6ibmq2_7">gamePaused</field>
+                    <value name="VALUE">
+                      <block type="logic_boolean" id="bool_mw6ibmq4_24">
+                        <field name="BOOL">FALSE</field>
+                      </block>
+                    </value>
+                  </block>
+                    <next>
+                    <block type="controls_for" id="for_mw6ibmq5_25">
+                      <field name="VAR" id="var_i_mw6ibmq3_8">i</field>
+                      <value name="FROM">
+                        <shadow type="math_number"><field name="NUM">0</field></shadow>
+                      </value>
+                      <value name="TO">
+                        <shadow type="math_number"><field name="NUM">10</field></shadow>
+                      </value>
+                      <value name="BY">
+                        <shadow type="math_number"><field name="NUM">1</field></shadow>
+                      </value>
+                      <statement name="DO">
+                        <block type="arduino_pin_mode" id="call_mw6ibmqg_26">
+                          <field name="MODE">OUTPUT</field>
+                          <value name="PIN">
+                            <block type="lists_getIndex" id="arr_get_mw6ibmqh_27">
+                              <mutation statement="false" at="true"></mutation>
+                              <field name="MODE">GET</field>
+                              <field name="WHERE">FROM_START</field>
+                              <value name="VALUE">
+                                <block type="variables_get" id="vget_mw6ibmqh_28">
+                                  <field name="VAR" id="var_ledPins_mw6ibmq2_1">ledPins</field>
+                                </block>
+                              </value>
+                              <value name="AT">
+                                <block type="math_arithmetic" id="idx_add_mw6ibmqh_29">
+                                  <field name="OP">ADD</field>
+                                  <value name="A">
+                                    <block type="variables_get" id="vget_mw6ibmqh_30">
+                                      <field name="VAR" id="var_i_mw6ibmq3_8">i</field>
+                                    </block>
+                                  </value>
+                                  <value name="B">
+                                    <shadow type="math_number"><field name="NUM">1</field></shadow>
+                                  </value>
+                                </block>
+                              </value>
+                            </block>
+                          </value>
+                        </block>
+                      </statement>
+                    </block>
+                      <next>
+                      <block type="arduino_pin_mode" id="call_mw6ibmqh_31">
+                        <field name="MODE">INPUT_PULLUP</field>
+                        <value name="PIN">
+                          <block type="variables_get" id="vget_mw6ibmqh_32">
+                            <field name="VAR" id="var_buttonPin_mw6ibmq2_3">buttonPin</field>
+                          </block>
+                        </value>
+                      </block>
+                        <next>
+                        <block type="arduino_pin_mode" id="call_mw6ibmqh_33">
+                          <field name="MODE">OUTPUT</field>
+                          <value name="PIN">
+                            <block type="variables_get" id="vget_mw6ibmqh_34">
+                              <field name="VAR" id="var_buzzerPin_mw6ibmq2_4">buzzerPin</field>
+                            </block>
+                          </value>
+                        </block>
+                          <next>
+                          <block type="procedures_callnoreturn" id="call_mw6ibmqh_35">
+                            <mutation name="turnOffAllLeds">
+                            </mutation>
+                          </block>
+                            <next>
+                            <block type="arduino_digital_write" id="call_mw6ibmqh_36">
+                              <value name="PIN">
+                                <block type="variables_get" id="vget_mw6ibmqh_37">
+                                  <field name="VAR" id="var_buzzerPin_mw6ibmq2_4">buzzerPin</field>
+                                </block>
+                              </value>
+                              <value name="STATE">
+                                <block type="arduino_level" id="lvl_mw6ibmqh_38">
+                                  <field name="LEVEL">LOW</field>
+                                </block>
+                              </value>
+                            </block>
+                            </next>
+                          </next>
+                        </next>
+                      </next>
+                    </next>
+                  </next>
+                </next>
+              </next>
+            </next>
+          </next>
+        </next>
+    </statement>
+    <statement name="LOOP">
+      <block type="controls_if" id="if_mw6ibmqi_39">
+        <value name="IF0">
+          <block type="logic_negate" id="not_mw6ibmqi_40">
+            <value name="BOOL">
+              <block type="variables_get" id="vget_mw6ibmqi_41">
+                <field name="VAR" id="var_gamePaused_mw6ibmq2_7">gamePaused</field>
+              </block>
+            </value>
+          </block>
+        </value>
+        <statement name="DO0">
+          <block type="procedures_callnoreturn" id="call_mw6ibmqi_42">
+            <mutation name="turnOffAllLeds">
+            </mutation>
+          </block>
+            <next>
+            <block type="arduino_digital_write" id="call_mw6ibmqi_43">
+              <value name="PIN">
+                <block type="lists_getIndex" id="arr_get_mw6ibmqi_44">
+                  <mutation statement="false" at="true"></mutation>
+                  <field name="MODE">GET</field>
+                  <field name="WHERE">FROM_START</field>
+                  <value name="VALUE">
+                    <block type="variables_get" id="vget_mw6ibmqi_45">
+                      <field name="VAR" id="var_ledPins_mw6ibmq2_1">ledPins</field>
+                    </block>
+                  </value>
+                  <value name="AT">
+                    <block type="math_arithmetic" id="idx_add_mw6ibmqi_46">
+                      <field name="OP">ADD</field>
+                      <value name="A">
+                        <block type="variables_get" id="vget_mw6ibmqi_47">
+                          <field name="VAR" id="var_currentLed_mw6ibmq2_6">currentLed</field>
+                        </block>
+                      </value>
+                      <value name="B">
+                        <shadow type="math_number"><field name="NUM">1</field></shadow>
+                      </value>
+                    </block>
+                  </value>
+                </block>
+              </value>
+              <value name="STATE">
+                <block type="arduino_level" id="lvl_mw6ibmqi_48">
+                  <field name="LEVEL">HIGH</field>
+                </block>
+              </value>
+            </block>
+              <next>
+              <block type="arduino_delay" id="call_mw6ibmqi_49">
+                <value name="DELAY_TIME_MS">
+                  <block type="math_number" id="num_mw6ibmqi_50">
+                    <field name="NUM">100</field>
+                  </block>
+                </value>
+              </block>
+                <next>
+                <block type="controls_if" id="if_mw6ibmqi_51">
+                  <value name="IF0">
+                    <block type="logic_compare" id="bin_mw6ibmqi_52">
+                      <field name="OP">EQ</field>
+                      <value name="A">
+                        <block type="arduino_digital_read" id="vcall_mw6ibmqj_53">
+                          <value name="PIN">
+                            <block type="variables_get" id="vget_mw6ibmqj_54">
+                              <field name="VAR" id="var_buttonPin_mw6ibmq2_3">buttonPin</field>
+                            </block>
+                          </value>
+                        </block>
+                      </value>
+                      <value name="B">
+                        <block type="arduino_level" id="lvl_mw6ibmqj_55">
+                          <field name="LEVEL">LOW</field>
+                        </block>
+                      </value>
+                    </block>
+                  </value>
+                  <statement name="DO0">
+                    <block type="variables_set" id="set_mw6ibmqj_56">
+                      <field name="VAR" id="var_gamePaused_mw6ibmq2_7">gamePaused</field>
+                      <value name="VALUE">
+                        <block type="logic_boolean" id="bool_mw6ibmqj_57">
+                          <field name="BOOL">TRUE</field>
+                        </block>
+                      </value>
+                    </block>
+                      <next>
+                      <block type="arduino_delay" id="call_mw6ibmqj_58">
+                        <value name="DELAY_TIME_MS">
+                          <block type="math_number" id="num_mw6ibmqj_59">
+                            <field name="NUM">200</field>
+                          </block>
+                        </value>
+                      </block>
+                        <next>
+                        <block type="procedures_callnoreturn" id="call_mw6ibmqj_60">
+                          <mutation name="checkResult">
+                          </mutation>
+                        </block>
+                        </next>
+                      </next>
+                  </statement>
+                </block>
+                  <next>
+                  <block type="variables_set" id="set_mw6ibmqk_61">
+                    <field name="VAR" id="var_currentLed_mw6ibmq2_6">currentLed</field>
+                    <value name="VALUE">
+                      <block type="math_modulo" id="bin_mw6ibmqk_62">
+                        <value name="DIVIDEND">
+                          <block type="math_arithmetic" id="bin_mw6ibmqk_63">
+                            <field name="OP">ADD</field>
+                            <value name="A">
+                              <block type="variables_get" id="vget_mw6ibmqk_64">
+                                <field name="VAR" id="var_currentLed_mw6ibmq2_6">currentLed</field>
+                              </block>
+                            </value>
+                            <value name="B">
+                              <block type="math_number" id="num_mw6ibmqk_65">
+                                <field name="NUM">1</field>
+                              </block>
+                            </value>
+                          </block>
+                        </value>
+                        <value name="DIVISOR">
+                          <block type="variables_get" id="vget_mw6ibmqk_66">
+                            <field name="VAR" id="var_totalLeds_mw6ibmq2_5">totalLeds</field>
+                          </block>
+                        </value>
+                      </block>
+                    </value>
+                  </block>
+                  </next>
+                </next>
+              </next>
+            </next>
+        </statement>
+      </block>
+    </statement>
+  </block>
+  <block type="procedures_defnoreturn" id="proc_mw6ibmqk_67" x="40" y="440">
+    <field name="NAME">checkResult</field>
+    <statement name="STACK">
+      <block type="controls_if" id="if_mw6ibmqk_68">
+        <mutation elseif="0" else="1"></mutation>
+        <value name="IF0">
+          <block type="logic_compare" id="bin_mw6ibmqk_69">
+            <field name="OP">EQ</field>
+            <value name="A">
+              <block type="lists_getIndex" id="arr_get_mw6ibmqk_70">
+                <mutation statement="false" at="true"></mutation>
+                <field name="MODE">GET</field>
+                <field name="WHERE">FROM_START</field>
+                <value name="VALUE">
+                  <block type="variables_get" id="vget_mw6ibmqk_71">
+                    <field name="VAR" id="var_ledPins_mw6ibmq2_1">ledPins</field>
+                  </block>
+                </value>
+                <value name="AT">
+                  <block type="math_arithmetic" id="idx_add_mw6ibmqk_72">
+                    <field name="OP">ADD</field>
+                    <value name="A">
+                      <block type="variables_get" id="vget_mw6ibmqk_73">
+                        <field name="VAR" id="var_currentLed_mw6ibmq2_6">currentLed</field>
+                      </block>
+                    </value>
+                    <value name="B">
+                      <shadow type="math_number"><field name="NUM">1</field></shadow>
+                    </value>
+                  </block>
+                </value>
+              </block>
+            </value>
+            <value name="B">
+              <block type="variables_get" id="vget_mw6ibmqk_74">
+                <field name="VAR" id="var_redLedPin_mw6ibmq2_2">redLedPin</field>
+              </block>
+            </value>
+          </block>
+        </value>
+        <statement name="DO0">
+          <block type="procedures_callnoreturn" id="call_mw6ibmqk_75">
+            <mutation name="happyBeep">
+            </mutation>
+          </block>
+        </statement>
+        <statement name="ELSE">
+          <block type="procedures_callnoreturn" id="call_mw6ibmqk_76">
+            <mutation name="sadBeep">
+            </mutation>
+          </block>
+        </statement>
+      </block>
+        <next>
+        <block type="arduino_delay" id="call_mw6ibmr8_77">
+          <value name="DELAY_TIME_MS">
+            <block type="math_number" id="num_mw6ibmr8_78">
+              <field name="NUM">2000</field>
+            </block>
+          </value>
+        </block>
+          <next>
+          <block type="variables_set" id="set_mw6ibmr8_79">
+            <field name="VAR" id="var_gamePaused_mw6ibmq2_7">gamePaused</field>
+            <value name="VALUE">
+              <block type="logic_boolean" id="bool_mw6ibmr8_80">
+                <field name="BOOL">FALSE</field>
+              </block>
+            </value>
+          </block>
+          </next>
+        </next>
+    </statement>
+  </block>
+  <block type="procedures_defnoreturn" id="proc_mw6ibmr8_81" x="40" y="740">
+    <field name="NAME">happyBeep</field>
+    <statement name="STACK">
+      <block type="arduino_tone" id="call_mw6ibmr8_82">
+        <value name="PIN">
+          <block type="variables_get" id="vget_mw6ibmr8_83">
+            <field name="VAR" id="var_buzzerPin_mw6ibmq2_4">buzzerPin</field>
+          </block>
+        </value>
+        <value name="FREQUENCY">
+          <block type="math_number" id="num_mw6ibmr8_84">
+            <field name="NUM">1000</field>
+          </block>
+        </value>
+        <value name="DURATION">
+          <block type="math_number" id="num_mw6ibmr8_85">
+            <field name="NUM">200</field>
+          </block>
+        </value>
+      </block>
+        <next>
+        <block type="arduino_delay" id="call_mw6ibmr8_86">
+          <value name="DELAY_TIME_MS">
+            <block type="math_number" id="num_mw6ibmr8_87">
+              <field name="NUM">300</field>
+            </block>
+          </value>
+        </block>
+          <next>
+          <block type="arduino_tone" id="call_mw6ibmr8_88">
+            <value name="PIN">
+              <block type="variables_get" id="vget_mw6ibmr8_89">
+                <field name="VAR" id="var_buzzerPin_mw6ibmq2_4">buzzerPin</field>
+              </block>
+            </value>
+            <value name="FREQUENCY">
+              <block type="math_number" id="num_mw6ibmr8_90">
+                <field name="NUM">1500</field>
+              </block>
+            </value>
+            <value name="DURATION">
+              <block type="math_number" id="num_mw6ibmr8_91">
+                <field name="NUM">200</field>
+              </block>
+            </value>
+          </block>
+            <next>
+            <block type="arduino_delay" id="call_mw6ibmr8_92">
+              <value name="DELAY_TIME_MS">
+                <block type="math_number" id="num_mw6ibmr8_93">
+                  <field name="NUM">300</field>
+                </block>
+              </value>
+            </block>
+              <next>
+              <block type="arduino_notone" id="call_mw6ibmr8_94">
+                <value name="PIN">
+                  <block type="variables_get" id="vget_mw6ibmr8_95">
+                    <field name="VAR" id="var_buzzerPin_mw6ibmq2_4">buzzerPin</field>
+                  </block>
+                </value>
+              </block>
+              </next>
+            </next>
+          </next>
+        </next>
+    </statement>
+  </block>
+  <block type="procedures_defnoreturn" id="proc_mw6ibmr8_96" x="40" y="1040">
+    <field name="NAME">sadBeep</field>
+    <statement name="STACK">
+      <block type="arduino_tone" id="call_mw6ibmr8_97">
+        <value name="PIN">
+          <block type="variables_get" id="vget_mw6ibmr8_98">
+            <field name="VAR" id="var_buzzerPin_mw6ibmq2_4">buzzerPin</field>
+          </block>
+        </value>
+        <value name="FREQUENCY">
+          <block type="math_number" id="num_mw6ibmr8_99">
+            <field name="NUM">400</field>
+          </block>
+        </value>
+        <value name="DURATION">
+          <block type="math_number" id="num_mw6ibmr8_100">
+            <field name="NUM">400</field>
+          </block>
+        </value>
+      </block>
+        <next>
+        <block type="arduino_delay" id="call_mw6ibmr8_101">
+          <value name="DELAY_TIME_MS">
+            <block type="math_number" id="num_mw6ibmr8_102">
+              <field name="NUM">500</field>
+            </block>
+          </value>
+        </block>
+          <next>
+          <block type="arduino_notone" id="call_mw6ibmr8_103">
+            <value name="PIN">
+              <block type="variables_get" id="vget_mw6ibmr8_104">
+                <field name="VAR" id="var_buzzerPin_mw6ibmq2_4">buzzerPin</field>
+              </block>
+            </value>
+          </block>
+          </next>
+        </next>
+    </statement>
+  </block>
+  <block type="procedures_defnoreturn" id="proc_mw6ibmr8_105" x="40" y="1340">
+    <field name="NAME">turnOffAllLeds</field>
+    <statement name="STACK">
+      <block type="controls_for" id="for_mw6ibmr8_106">
+        <field name="VAR" id="var_i_mw6ibmq3_8">i</field>
+        <value name="FROM">
+          <shadow type="math_number"><field name="NUM">0</field></shadow>
+        </value>
+        <value name="TO">
+          <shadow type="math_number"><field name="NUM">10</field></shadow>
+        </value>
+        <value name="BY">
+          <shadow type="math_number"><field name="NUM">1</field></shadow>
+        </value>
+        <statement name="DO">
+          <block type="arduino_digital_write" id="call_mw6ibmr8_107">
+            <value name="PIN">
+              <block type="lists_getIndex" id="arr_get_mw6ibmr8_108">
+                <mutation statement="false" at="true"></mutation>
+                <field name="MODE">GET</field>
+                <field name="WHERE">FROM_START</field>
+                <value name="VALUE">
+                  <block type="variables_get" id="vget_mw6ibmr8_109">
+                    <field name="VAR" id="var_ledPins_mw6ibmq2_1">ledPins</field>
+                  </block>
+                </value>
+                <value name="AT">
+                  <block type="math_arithmetic" id="idx_add_mw6ibmr8_110">
+                    <field name="OP">ADD</field>
+                    <value name="A">
+                      <block type="variables_get" id="vget_mw6ibmr8_111">
+                        <field name="VAR" id="var_i_mw6ibmq3_8">i</field>
+                      </block>
+                    </value>
+                    <value name="B">
+                      <shadow type="math_number"><field name="NUM">1</field></shadow>
+                    </value>
+                  </block>
+                </value>
+              </block>
+            </value>
+            <value name="STATE">
+              <block type="arduino_level" id="lvl_mw6ibmr8_112">
+                <field name="LEVEL">LOW</field>
+              </block>
+            </value>
+          </block>
+        </statement>
+      </block>
+    </statement>
+  </block>
+</xml>

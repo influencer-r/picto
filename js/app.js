@@ -283,79 +283,128 @@
       }
     });
 
-    // Robust error-trapped PictoBlox .sb3 export using JSZip
-    const attachExportHandler = (btn) => {
-      if (!btn) return;
-      btn.addEventListener('click', async function(e) {
-        if (e) {
-          e.preventDefault();
-          e.stopPropagation();
+    // Cross-browser reliable file download helper
+    const triggerFileDownload = (blob, filename) => {
+      // 1. IE / legacy Edge
+      if (typeof window !== 'undefined' && window.navigator && window.navigator.msSaveOrOpenBlob) {
+        window.navigator.msSaveOrOpenBlob(blob, filename);
+        return;
+      }
+
+      // 2. Standard Blob URL + Anchor element (attached to DOM, off-screen)
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.setAttribute('download', filename);
+      a.setAttribute('href', url);
+      a.style.position = 'fixed';
+      a.style.left = '-9999px';
+      a.style.top = '-9999px';
+      a.style.opacity = '0';
+      document.body.appendChild(a);
+
+      try {
+        const clickEvent = new MouseEvent('click', {
+          bubbles: true,
+          cancelable: true,
+          view: window
+        });
+        a.dispatchEvent(clickEvent);
+      } catch (err) {
+        a.click();
+      }
+
+      setTimeout(() => {
+        if (a.parentNode) {
+          a.parentNode.removeChild(a);
         }
-        if (elements.exportDropdown) {
-          elements.exportDropdown.classList.remove('open');
-        }
-
-        try {
-          // Verify JSZip is loaded
-          const JSZipLib = (typeof JSZip !== 'undefined') ? JSZip
-            : (typeof window !== 'undefined' && window.JSZip) ? window.JSZip
-            : null;
-
-          if (!JSZipLib) {
-            alert("JSZip library is still loading. Please check your internet connection or try again in a moment.");
-            return;
-          }
-
-          // Retrieve generated project JSON object/string
-          const projectJson = getGeneratedProjectJson();
-
-          const zip = new JSZipLib();
-          // PictoBlox strictly requires the root logic file inside the .sb3 package to be 'project.json'
-          zip.file("project.json", typeof projectJson === 'string' ? projectJson : JSON.stringify(projectJson, null, 2));
-
-          // Embed required costume SVG assets so PictoBlox does not hang on purple loading screen
-          if (typeof PictoBloxExporter !== 'undefined' && PictoBloxExporter.ASSETS) {
-            zip.file(PictoBloxExporter.ASSETS.backdropMd5, PictoBloxExporter.ASSETS.backdropSvg);
-            zip.file(PictoBloxExporter.ASSETS.arduinoMd5, PictoBloxExporter.ASSETS.arduinoSvg);
-          }
-
-          // Generate the blob
-          const blob = await zip.generateAsync({
-            type: "blob",
-            compression: "DEFLATE",
-            compressionOptions: { level: 6 }
-          });
-
-          // Trigger browser download
-          const url = window.URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.style.display = 'none';
-          a.href = url;
-          a.download = "pictoblox_project.sb3";
-          document.body.appendChild(a);
-          a.click();
-
-          // Cleanup
-          setTimeout(() => {
-            if (a.parentNode) {
-              a.parentNode.removeChild(a);
-            }
-            window.URL.revokeObjectURL(url);
-          }, 1500);
-
-          showToast("Download Complete! Saved as pictoblox_project.sb3");
-
-        } catch (err) {
-          console.error("Export failed:", err);
-          alert("Failed to export project: " + err.message);
-        }
-      });
+        window.URL.revokeObjectURL(url);
+      }, 2000);
     };
 
-    attachExportHandler(document.getElementById('export-btn'));
-    attachExportHandler(document.getElementById('exportSb3Dropdown'));
-    attachExportHandler(document.getElementById('exportSb3Btn'));
-    attachExportHandler(document.getElementById('exportJsonBtn'));
+    // Robust error-trapped PictoBlox .sb3 export using JSZip
+    const handleSb3Export = async (buttonEl) => {
+      console.log('Initiating .sb3 package generation...');
+      if (elements.exportDropdown) {
+        elements.exportDropdown.classList.remove('open');
+      }
+
+      // Visual feedback on button
+      const mainExportBtn = document.getElementById('export-btn');
+      const originalHtml = mainExportBtn ? mainExportBtn.innerHTML : '';
+      if (mainExportBtn) {
+        mainExportBtn.disabled = true;
+        mainExportBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Exporting...';
+      }
+
+      try {
+        // Verify JSZip is loaded
+        const JSZipLib = (typeof JSZip !== 'undefined') ? JSZip
+          : (typeof window !== 'undefined' && window.JSZip) ? window.JSZip
+          : null;
+
+        if (!JSZipLib) {
+          alert("JSZip library is still loading. Please check your internet connection or try again in a moment.");
+          return;
+        }
+
+        // Retrieve generated project JSON object/string
+        const projectJson = getGeneratedProjectJson();
+
+        const zip = new JSZipLib();
+        // PictoBlox strictly requires the root logic file inside the .sb3 package to be 'project.json'
+        zip.file("project.json", typeof projectJson === 'string' ? projectJson : JSON.stringify(projectJson, null, 2));
+
+        // Embed required costume SVG assets so PictoBlox does not hang on purple loading screen
+        if (typeof PictoBloxExporter !== 'undefined' && PictoBloxExporter.ASSETS) {
+          zip.file(PictoBloxExporter.ASSETS.backdropMd5, PictoBloxExporter.ASSETS.backdropSvg);
+          zip.file(PictoBloxExporter.ASSETS.arduinoMd5, PictoBloxExporter.ASSETS.arduinoSvg);
+        }
+
+        // Generate binary ZIP archive with official .sb3 MIME type
+        const blob = await zip.generateAsync({
+          type: "blob",
+          compression: "DEFLATE",
+          compressionOptions: { level: 6 },
+          mimeType: "application/x.scratch.sb3"
+        });
+
+        console.log('Generated zip blob, triggering download, size:', blob.size);
+        // Trigger download
+        triggerFileDownload(blob, "pictoblox_project.sb3");
+        showToast("Download Complete! Saved as pictoblox_project.sb3");
+
+      } catch (err) {
+        console.error("Export failed:", err);
+        alert("Failed to export project: " + err.message);
+      } finally {
+        if (mainExportBtn) {
+          mainExportBtn.disabled = false;
+          mainExportBtn.innerHTML = originalHtml || '<i class="fa-solid fa-download"></i> Export (.sb3)';
+        }
+      }
+    };
+
+    // Attach to specific elements
+    ['export-btn', 'exportSb3Dropdown', 'exportSb3Btn', 'exportJsonBtn'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          handleSb3Export(el);
+        });
+      }
+    });
+
+    // Global click delegation ensures export triggers even if dynamically rendered
+    document.addEventListener('click', (e) => {
+      const sb3Trigger = e.target.closest('#export-btn, #exportSb3Dropdown, #exportSb3Btn, #exportJsonBtn, .btn-export-main');
+      if (sb3Trigger) {
+        e.preventDefault();
+        e.stopPropagation();
+        handleSb3Export(sb3Trigger);
+      }
+    });
 
     document.getElementById('exportInoBtn').addEventListener('click', () => {
       try {
