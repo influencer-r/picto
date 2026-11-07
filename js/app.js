@@ -283,20 +283,64 @@
       }
     });
 
-    // Export PictoBlox Project (.sb3) using JSZip packaging
-    const handleSb3Export = async () => {
-      try {
-        await exportPictoBloxSb3('my_pictoblox_project.sb3');
-        showToast('Download Complete! Saved as my_pictoblox_project.sb3');
-      } catch (err) {
-        showToast('Export failed: ' + err.message, 'error');
-      }
+    // Robust error-trapped PictoBlox .sb3 export using JSZip
+    const attachExportHandler = (btn) => {
+      if (!btn) return;
+      btn.addEventListener('click', async function() {
+        try {
+          // Verify JSZip is loaded
+          if (typeof JSZip === 'undefined') {
+            alert("JSZip library is still loading. Please try again in a moment.");
+            return;
+          }
+
+          // Retrieve generated project JSON object/string
+          const projectJson = getGeneratedProjectJson();
+
+          const zip = new JSZip();
+          // PictoBlox strictly requires the root logic file inside the .sb3 package to be 'project.json'
+          zip.file("project.json", typeof projectJson === 'string' ? projectJson : JSON.stringify(projectJson, null, 2));
+
+          // Embed required costume SVG assets so PictoBlox does not hang on purple loading screen
+          if (typeof PictoBloxExporter !== 'undefined' && PictoBloxExporter.ASSETS) {
+            zip.file(PictoBloxExporter.ASSETS.backdropMd5, PictoBloxExporter.ASSETS.backdropSvg);
+            zip.file(PictoBloxExporter.ASSETS.arduinoMd5, PictoBloxExporter.ASSETS.arduinoSvg);
+          }
+
+          // Generate the blob
+          const blob = await zip.generateAsync({
+            type: "blob",
+            compression: "DEFLATE",
+            compressionOptions: { level: 6 }
+          });
+
+          // Trigger browser download
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.style.display = 'none';
+          a.href = url;
+          a.download = "pictoblox_project.sb3";
+          document.body.appendChild(a);
+          a.click();
+
+          // Cleanup
+          setTimeout(() => {
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+          }, 1000);
+
+          showToast("Download Complete! Saved as pictoblox_project.sb3");
+
+        } catch (err) {
+          console.error("Export failed:", err);
+          alert("Failed to export project: " + err.message);
+        }
+      });
     };
 
-    const exportSb3Btn = document.getElementById('exportSb3Btn') || document.getElementById('exportJsonBtn');
-    if (exportSb3Btn) {
-      exportSb3Btn.addEventListener('click', handleSb3Export);
-    }
+    attachExportHandler(document.getElementById('export-btn'));
+    attachExportHandler(document.getElementById('exportSb3Btn'));
+    attachExportHandler(document.getElementById('exportJsonBtn'));
 
     document.getElementById('exportInoBtn').addEventListener('click', () => {
       try {
@@ -355,6 +399,17 @@
         });
       });
     });
+  }
+
+  /**
+   * Retrieve generated PictoBlox / Scratch 3.0 project JSON schema
+   */
+  function getGeneratedProjectJson() {
+    if (!workspace) {
+      throw new Error('Workspace is not initialized');
+    }
+    const exporter = new PictoBloxExporter.Exporter(workspace);
+    return exporter.getProjectJson();
   }
 
   /**
