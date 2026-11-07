@@ -283,10 +283,10 @@
       }
     });
 
+    // Export PictoBlox Project (.sb3) using JSZip packaging
     document.getElementById('exportJsonBtn').addEventListener('click', async () => {
       try {
-        const exporter = new PictoBloxExporter.Exporter(workspace);
-        await exporter.exportPictoBloxSb3('pictoblox_project.sb3');
+        await exportPictoBloxSb3('pictoblox_project.sb3');
         showToast('Download Complete! PictoBlox (.sb3) project saved.');
       } catch (err) {
         showToast('Export failed: ' + err.message, 'error');
@@ -350,6 +350,57 @@
         });
       });
     });
+  }
+
+  /**
+   * Export PictoBlox Project (.sb3) using JSZip
+   * Packages project.json inside a valid ZIP archive structure with MIME type application/x.scratch.sb3
+   * so PictoBlox unzips and reads project.json automatically upon load.
+   */
+  async function exportPictoBloxSb3(filename = 'pictoblox_project.sb3') {
+    if (!workspace) {
+      throw new Error('Workspace is not initialized');
+    }
+
+    // 1. Generate standard PictoBlox / Scratch 3.0 project schema
+    const exporter = new PictoBloxExporter.Exporter(workspace);
+    const projectData = exporter.getProjectJson();
+    const jsonString = JSON.stringify(projectData, null, 2);
+
+    // 2. Resolve JSZip library instance
+    const JSZipConstructor = (typeof JSZip !== 'undefined') ? JSZip
+      : (typeof window !== 'undefined' && window.JSZip) ? window.JSZip
+      : null;
+
+    if (!JSZipConstructor) {
+      throw new Error('JSZip library is missing. Please ensure jszip.min.js is included.');
+    }
+
+    // 3. Package project.json inside a valid ZIP archive structure
+    const zip = new JSZipConstructor();
+    zip.file('project.json', jsonString);
+
+    // 4. Generate the ZIP archive blob with application/x.scratch.sb3 MIME type
+    const zipBlob = await zip.generateAsync({
+      type: 'blob',
+      compression: 'DEFLATE',
+      compressionOptions: { level: 6 },
+      mimeType: 'application/x.scratch.sb3'
+    });
+
+    // 5. Trigger download with .sb3 extension
+    const url = URL.createObjectURL(zipBlob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename.endsWith('.sb3') ? filename : `${filename}.sb3`;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 300);
+
+    return zipBlob;
   }
 
   /**
