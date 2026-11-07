@@ -222,6 +222,28 @@ html, body {
   transform: translateY(-1px);
 }
 
+/* Split Export Button */
+.export-button-group {
+  display: inline-flex;
+  position: relative;
+  border-radius: var(--radius-md);
+  box-shadow: 0 2px 4px rgba(255, 171, 25, 0.3);
+}
+
+.btn-export-main {
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+  border-right: 1px solid rgba(0, 0, 0, 0.2) !important;
+  box-shadow: none !important;
+}
+
+.btn-export-toggle {
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+  padding: 7px 11px !important;
+  box-shadow: none !important;
+}
+
 .btn-icon {
   background: transparent;
   color: var(--text-muted);

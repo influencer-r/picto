@@ -24,8 +24,13 @@
   <!-- Application Stylesheet -->
   <link rel="stylesheet" href="styles.css">
 
-  <!-- JSZip Library in <head> before scripts -->
+  <!-- JSZip Library in <head> before scripts (with CDN fallback) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script>
+    if (typeof JSZip === 'undefined') {
+      document.write('<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"><\/script>');
+    }
+  </script>
 </head>
 <body>
 
@@ -62,14 +67,17 @@
         <i class="fa-solid fa-play"></i> Convert
       </button>
 
-      <!-- Export Dropdown -->
-      <div class="dropdown-wrapper">
-        <button id="btnExportMenu" class="btn btn-accent" title="Export or download project">
-          <i class="fa-solid fa-download"></i> Export Project <i class="fa-solid fa-chevron-down"></i>
+      <!-- Export Split Button (Direct 1-Click .sb3 Download + Dropdown Options) -->
+      <div class="dropdown-wrapper export-button-group">
+        <button id="export-btn" class="btn btn-accent btn-export-main" title="Export &amp; Download PictoBlox (.sb3) Project">
+          <i class="fa-solid fa-download"></i> Export (.sb3)
+        </button>
+        <button id="btnExportMenu" class="btn btn-accent btn-export-toggle" title="More export options">
+          <i class="fa-solid fa-chevron-down"></i>
         </button>
         <div id="exportDropdown" class="dropdown-menu">
           <div class="dropdown-header">Export &amp; Download</div>
-          <button id="export-btn" class="dropdown-item">
+          <button id="exportSb3Dropdown" class="dropdown-item">
             <i class="fa-solid fa-file-zipper"></i>
             <div>
               <span class="item-title">PictoBlox Project (.sb3)</span>

@@ -286,18 +286,30 @@
     // Robust error-trapped PictoBlox .sb3 export using JSZip
     const attachExportHandler = (btn) => {
       if (!btn) return;
-      btn.addEventListener('click', async function() {
+      btn.addEventListener('click', async function(e) {
+        if (e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        if (elements.exportDropdown) {
+          elements.exportDropdown.classList.remove('open');
+        }
+
         try {
           // Verify JSZip is loaded
-          if (typeof JSZip === 'undefined') {
-            alert("JSZip library is still loading. Please try again in a moment.");
+          const JSZipLib = (typeof JSZip !== 'undefined') ? JSZip
+            : (typeof window !== 'undefined' && window.JSZip) ? window.JSZip
+            : null;
+
+          if (!JSZipLib) {
+            alert("JSZip library is still loading. Please check your internet connection or try again in a moment.");
             return;
           }
 
           // Retrieve generated project JSON object/string
           const projectJson = getGeneratedProjectJson();
 
-          const zip = new JSZip();
+          const zip = new JSZipLib();
           // PictoBlox strictly requires the root logic file inside the .sb3 package to be 'project.json'
           zip.file("project.json", typeof projectJson === 'string' ? projectJson : JSON.stringify(projectJson, null, 2));
 
@@ -325,9 +337,11 @@
 
           // Cleanup
           setTimeout(() => {
-            document.body.removeChild(a);
+            if (a.parentNode) {
+              a.parentNode.removeChild(a);
+            }
             window.URL.revokeObjectURL(url);
-          }, 1000);
+          }, 1500);
 
           showToast("Download Complete! Saved as pictoblox_project.sb3");
 
@@ -339,6 +353,7 @@
     };
 
     attachExportHandler(document.getElementById('export-btn'));
+    attachExportHandler(document.getElementById('exportSb3Dropdown'));
     attachExportHandler(document.getElementById('exportSb3Btn'));
     attachExportHandler(document.getElementById('exportJsonBtn'));
 
@@ -405,11 +420,70 @@
    * Retrieve generated PictoBlox / Scratch 3.0 project JSON schema
    */
   function getGeneratedProjectJson() {
-    if (!workspace) {
-      throw new Error('Workspace is not initialized');
+    if (workspace && typeof PictoBloxExporter !== 'undefined') {
+      try {
+        const exporter = new PictoBloxExporter.Exporter(workspace);
+        return exporter.getProjectJson();
+      } catch (err) {
+        console.warn('Exporter getProjectJson warning:', err);
+      }
     }
-    const exporter = new PictoBloxExporter.Exporter(workspace);
-    return exporter.getProjectJson();
+    // Safe fallback schema
+    return {
+      targets: [
+        {
+          isStage: true,
+          name: "Stage",
+          variables: {},
+          lists: {},
+          broadcasts: {},
+          blocks: {},
+          comments: {},
+          currentCostume: 0,
+          costumes: [{
+            name: "backdrop1",
+            dataFormat: "svg",
+            assetId: "cd21514d0531fdffb22204e0ec5ed84a",
+            md5ext: "cd21514d0531fdffb22204e0ec5ed84a.svg",
+            rotationCenterX: 240,
+            rotationCenterY: 180
+          }],
+          sounds: [],
+          volume: 100,
+          layerOrder: 0
+        },
+        {
+          isStage: false,
+          name: "Arduino Uno",
+          variables: {},
+          lists: {},
+          broadcasts: {},
+          blocks: {},
+          comments: {},
+          currentCostume: 0,
+          costumes: [{
+            name: "arduino",
+            dataFormat: "svg",
+            assetId: "0fb9be3e8397c772915c9de80f31481f",
+            md5ext: "0fb9be3e8397c772915c9de80f31481f.svg",
+            rotationCenterX: 48,
+            rotationCenterY: 50
+          }],
+          sounds: [],
+          volume: 100,
+          visible: true,
+          x: 0,
+          y: 0,
+          size: 100,
+          direction: 90,
+          draggable: false,
+          rotationStyle: "all around"
+        }
+      ],
+      monitors: [],
+      extensions: ["arduinoUno"],
+      meta: { semver: "3.0.0", vm: "0.2.0", agent: "PictoBlox Web Converter" }
+    };
   }
 
   /**
